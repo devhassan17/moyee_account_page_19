@@ -419,7 +419,7 @@
         <field name="name">Moyee Portal Customization</field>
         <field name="res_model">res.config.settings</field>
         <field name="view_mode">form</field>
-        <field name="target">inline</field>
+        <field name="target">current</field>
         <field name="context">{'module': 'moyee_account_page_19', 'status': 1}</field>
     </record>
 
