@@ -1,4 +1,4 @@
-# File: moyee_subscription_portal_manager/models/account_move.py
+# File: moyee_account_page_19/models/account_move.py
 from odoo import models
 
 class AccountMove(models.Model):

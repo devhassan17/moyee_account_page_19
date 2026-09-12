@@ -1,6 +1,6 @@
-# Moyee Subscription Portal Manager
+# Moyee Account Page 19 (`moyee_account_page_19`)
 
-Advanced portal management for Moyee Coffee subscriptions.
+Advanced portal management and custom account page for Moyee Coffee subscriptions on Odoo 19.
 
 ## Features
 
@@ -12,19 +12,24 @@ Advanced portal management for Moyee Coffee subscriptions.
     - Postpone next delivery dates.
     - Add or remove products from active subscriptions.
     - Pause and resume subscriptions.
+- **Multi-Company & Company Configuration Filter**:
+    - Dynamic enablement/disablement per active company.
+    - Company-level allowed filter configuration options in backend settings.
 
 ## Technical Details
 
+- **Module Name**: `moyee_account_page_19`
 - **Author**: Managemyweb.co
 - **Maintainer**: ali@moyeecoffee.com
 - **License**: LGPL-3
-- **Odoo Version**: 18.0
+- **Odoo Version**: 19.0
 
 ## Installation
 
-1. Install the module from the Odoo Apps menu.
-2. Ensure dependencies (`sale_subscription`, `portal`, `website`) are installed.
-3. Portal users will see a "Manage Subscription" section in their account.
+1. Install the module `moyee_account_page_19` from the Odoo Apps menu.
+2. Ensure dependencies (`sale_management`, `sale_subscription`, `account`, `portal`, `website`) are installed.
+3. Configure settings under **Moyee Portal > Configuration**.
+4. Portal users will see the custom account page with subscription self-service controls.
 
 ---
-© 2024 Managemyweb.co
+© 2026 Managemyweb.co

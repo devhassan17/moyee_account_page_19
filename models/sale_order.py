@@ -1,4 +1,4 @@
-# File: moyee_subscription_portal_manager/models/sale_order.py
+# File: moyee_account_page_19/models/sale_order.py
 import logging
 import re
 import json

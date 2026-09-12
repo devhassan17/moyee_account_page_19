@@ -1,2 +1,2 @@
-# File: moyee_subscription_portal_manager/controllers/__init__.py
+# File: moyee_account_page_19/controllers/__init__.py
 from . import portal

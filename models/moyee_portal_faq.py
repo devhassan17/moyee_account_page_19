@@ -1,4 +1,4 @@
-# File: moyee_subscription_portal_manager/models/moyee_portal_faq.py
+# File: moyee_account_page_19/models/moyee_portal_faq.py
 from odoo import fields, models
 
 

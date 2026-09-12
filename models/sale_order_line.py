@@ -1,4 +1,4 @@
-# File: moyee_subscription_portal_manager/models/sale_order_line.py
+# File: moyee_account_page_19/models/sale_order_line.py
 import re
 from odoo import _, api, fields, models
 from odoo.exceptions import AccessError, UserError

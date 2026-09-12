@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- File: moyee_subscription_portal_manager/views/portal_my_account_templates.xml -->
+<!-- File: moyee_account_page_19/views/portal_my_account_templates.xml -->
 <odoo>
 
     <!-- =========================================================
@@ -63,40 +63,40 @@
                         </p>
 
                         <!-- ══════════ SUBSCRIPTION SECTION ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_subscription"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_subscription"/>
 
                         <!-- ══════════ OVERVIEW NAV CARDS ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_overview"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_overview"/>
 
                         <!-- ══════════ ORDERS ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_orders"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_orders"/>
 
                         <!-- ══════════ INVOICES ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_invoices"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_invoices"/>
 
                         <!-- ══════════ PERSONAL DETAILS ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_details"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_details"/>
 
                         <!-- ══════════ FAQ ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_faq"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_faq"/>
 
                         <!-- ══════════ BREW LIKE A PRO ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_brew_guides"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_brew_guides"/>
 
                         <!-- ══════════ EXTRA (INSPIRE / TAF) ══════════ -->
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_extra"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_extra"/>
 
                     </main>
 
                     <!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
                     <aside>
-                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_sidebar"/>
+                        <t t-call="moyee_account_page_19.portal_my_home_moyee_sidebar"/>
                     </aside>
 
                 </div>
 
                 <!-- ══════════════════════════ MODALS ══════════════════════════ -->
-                <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_modals"/>
+                <t t-call="moyee_account_page_19.portal_my_home_moyee_modals"/>
 
                 <!-- Dummy elements to satisfy site-wide custom scripts and prevent addEventListener crashes -->
                 <div style="display: none !important;">

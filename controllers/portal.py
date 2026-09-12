@@ -1,4 +1,4 @@
-# File: moyee_subscription_portal_manager/controllers/portal.py
+# File: moyee_account_page_19/controllers/portal.py
 import logging
 import re
 import json
@@ -243,35 +243,41 @@ class MoyeePortalHome(CustomerPortal):
         # Fetch configuration parameters
         ICP = request.env["ir.config_parameter"].sudo()
 
-        def _get_bool(param_name, default=True):
-            val = ICP.get_param(param_name, str(default))
-            return val.lower() in ("true", "1", "yes")
+        def _get_param(key, default=""):
+            val = ICP.get_param(f"moyee_account_page_19.{key}")
+            if val is None:
+                val = ICP.get_param(f"moyee_subscription_portal_manager.{key}", default)
+            return val
+
+        def _get_bool(key, default=True):
+            val = _get_param(key, str(default))
+            return str(val).lower() in ("true", "1", "yes")
 
         moyee_config = {
-            "primary_color": ICP.get_param("moyee_subscription_portal_manager.primary_color", "#E91E8C"),
-            "secondary_color": ICP.get_param("moyee_subscription_portal_manager.secondary_color", "#FCE4F3"),
-            "font_family": ICP.get_param("moyee_subscription_portal_manager.font_family", "system-ui"),
-            "show_subscription": _get_bool("moyee_subscription_portal_manager.show_subscription", True),
-            "show_overview": _get_bool("moyee_subscription_portal_manager.show_overview", True),
-            "show_orders": _get_bool("moyee_subscription_portal_manager.show_orders", True),
-            "show_invoices": _get_bool("moyee_subscription_portal_manager.show_invoices", True),
-            "show_faq": _get_bool("moyee_subscription_portal_manager.show_faq", True),
-            "show_inspire": _get_bool("moyee_subscription_portal_manager.show_inspire", True),
-            "show_taf": _get_bool("moyee_subscription_portal_manager.show_taf", True),
-            "show_brew_guides": _get_bool("moyee_subscription_portal_manager.show_brew_guides", True),
-            "brew_guides_all_url": ICP.get_param("moyee_subscription_portal_manager.brew_guides_all_url", "/shop"),
-            "show_sidebar_profile": _get_bool("moyee_subscription_portal_manager.show_sidebar_profile", True),
-            "show_sidebar_upsell": _get_bool("moyee_subscription_portal_manager.show_sidebar_upsell", True),
-            "show_sidebar_support": _get_bool("moyee_subscription_portal_manager.show_sidebar_support", True),
-            "upsell_cta_url": ICP.get_param("moyee_subscription_portal_manager.upsell_cta_url", "/shop"),
-            "support_email": ICP.get_param("moyee_subscription_portal_manager.support_email", "hello@moyeecoffee.com"),
-            "inspire_eyebrow": ICP.get_param("moyee_subscription_portal_manager.inspire_eyebrow", "Do you know where your coffee comes from?"),
-            "inspire_title": ICP.get_param("moyee_subscription_portal_manager.inspire_title", "Your coffee comes from Ethiopia"),
-            "inspire_body": ICP.get_param("moyee_subscription_portal_manager.inspire_body", "Your Moyee coffee comes from small farmers in the Kaffa forest in Ethiopia. They receive a fair price — thanks to you."),
-            "inspire_btn1_text": ICP.get_param("moyee_subscription_portal_manager.inspire_btn1_text", "Read the story"),
-            "inspire_btn1_url": ICP.get_param("moyee_subscription_portal_manager.inspire_btn1_url", "/radical-impact-coffee"),
-            "inspire_btn2_text": ICP.get_param("moyee_subscription_portal_manager.inspire_btn2_text", "Browse our coffee"),
-            "inspire_btn2_url": ICP.get_param("moyee_subscription_portal_manager.inspire_btn2_url", "/shop"),
+            "primary_color": _get_param("primary_color", "#E91E8C"),
+            "secondary_color": _get_param("secondary_color", "#FCE4F3"),
+            "font_family": _get_param("font_family", "system-ui"),
+            "show_subscription": _get_bool("show_subscription", True),
+            "show_overview": _get_bool("show_overview", True),
+            "show_orders": _get_bool("show_orders", True),
+            "show_invoices": _get_bool("show_invoices", True),
+            "show_faq": _get_bool("show_faq", True),
+            "show_inspire": _get_bool("show_inspire", True),
+            "show_taf": _get_bool("show_taf", True),
+            "show_brew_guides": _get_bool("show_brew_guides", True),
+            "brew_guides_all_url": _get_param("brew_guides_all_url", "/shop"),
+            "show_sidebar_profile": _get_bool("show_sidebar_profile", True),
+            "show_sidebar_upsell": _get_bool("show_sidebar_upsell", True),
+            "show_sidebar_support": _get_bool("show_sidebar_support", True),
+            "upsell_cta_url": _get_param("upsell_cta_url", "/shop"),
+            "support_email": _get_param("support_email", "hello@moyeecoffee.com"),
+            "inspire_eyebrow": _get_param("inspire_eyebrow", "Do you know where your coffee comes from?"),
+            "inspire_title": _get_param("inspire_title", "Your coffee comes from Ethiopia"),
+            "inspire_body": _get_param("inspire_body", "Your Moyee coffee comes from small farmers in the Kaffa forest in Ethiopia. They receive a fair price — thanks to you."),
+            "inspire_btn1_text": _get_param("inspire_btn1_text", "Read the story"),
+            "inspire_btn1_url": _get_param("inspire_btn1_url", "/radical-impact-coffee"),
+            "inspire_btn2_text": _get_param("inspire_btn2_text", "Browse our coffee"),
+            "inspire_btn2_url": _get_param("inspire_btn2_url", "/shop"),
         }
 
         # Variant map for front-end cascading selections
@@ -360,9 +366,23 @@ class MoyeePortalHome(CustomerPortal):
         company = getattr(request, "website", False) and request.website.company_id or request.env.company
         company_sudo = company.sudo()
         
-        # Hardcode company check: only allow for Moyee Coffee
-        if company and "Moyee Coffee" not in company.name:
-            return False
+        # Check company portal toggle for active company
+        if "moyee_enable_company_portal" in company_sudo._fields:
+            try:
+                if not company_sudo.moyee_enable_company_portal:
+                    return False
+            except Exception:
+                pass
+
+        # Check allowed company filter if enabled
+        if "moyee_enable_company_filter" in company_sudo._fields and company_sudo.moyee_enable_company_filter:
+            try:
+                allowed_companies = company_sudo.moyee_allowed_company_ids
+                if allowed_companies and company.id not in allowed_companies.ids:
+                    return False
+            except Exception as e:
+                _logger.error("Moyee company filter error: %s", e)
+                return False
 
         enable_user_filter = False
         if "moyee_enable_user_filter" in company_sudo._fields:
@@ -383,8 +403,7 @@ class MoyeePortalHome(CustomerPortal):
                 if partner.id not in all_allowed_ids and commercial.id not in all_allowed_ids:
                     return False
             except Exception as e:
-                import logging
-                logging.getLogger(__name__).error("Moyee user filter error: %s", e)
+                _logger.error("Moyee user filter error: %s", e)
                 return False
 
         return True
@@ -397,7 +416,7 @@ class MoyeePortalHome(CustomerPortal):
         values = self._prepare_portal_layout_values()
         home_values = self._prepare_home_portal_values(counters=set(), **kw)
         values.update(home_values)
-        return request.render("moyee_subscription_portal_manager.portal_my_home_moyee", values)
+        return request.render("moyee_account_page_19.portal_my_home_moyee", values)
 
     @http.route(["/my/account"], type="http", auth="user", website=True)
     def account(self, redirect=None, **post):
@@ -672,7 +691,7 @@ class MoyeeSubscriptionPortal(http.Controller):
             "close_reasons": close_reasons,
             "access_token": access_token,
         }
-        return request.render("moyee_subscription_portal_manager.portal_subscription_manage", values)
+        return request.render("moyee_account_page_19.portal_subscription_manage", values)
 
     # ------------------------------------------------------------
     # Actions
