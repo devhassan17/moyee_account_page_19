@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    
+
+    <template id="report_invoice_document_moyee_filter_lines"
+              inherit_id="account.report_invoice_document">
+
+        <xpath expr="//table[@name='invoice_line_table']//t[@t-foreach='lines']"
+               position="attributes">
+
+            <attribute name="t-foreach">lines.filtered(lambda l: l.display_type or not l.sale_line_ids.filtered(lambda sol: sol.x_moyee_is_removed))</attribute>
+
+        </xpath>
+
+    </template>
+
+</odoo>

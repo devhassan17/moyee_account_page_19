@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- File: moyee_subscription_portal_manager/views/portal_my_account_templates.xml -->
+<odoo>
+
+    <!-- =========================================================
+         Standalone template for /my/home — Moyee account design.
+         Rendered via controller override (MoyeePortalHome.home).
+         Does NOT inherit portal.portal_my_home to avoid breaking
+         other modules' xpath targets.
+
+         Uses sub-templates defined in portal_my_account_sub_templates.xml
+         ========================================================= -->
+    <template id="portal_my_home_moyee" name="Moyee My Account Page">
+        <t t-call="portal.portal_layout">
+
+            <div class="moyee-account-page">
+
+                <!-- ══ Styling Overrides from Backend Settings ══ -->
+                <t t-if="moyee_config">
+                    <!-- Google Fonts Loader if customized -->
+                    <t t-if="moyee_config.get('font_family') and moyee_config['font_family'] != 'system-ui'">
+                        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+                        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin"/>
+                        <link t-attf-href="https://fonts.googleapis.com/css2?family={{ moyee_config['font_family'].replace(' ', '+') }}:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+                    </t>
+                    <style>
+                        :root {
+                            <t t-if="moyee_config.get('primary_color')">--moyee-pink: <t t-esc="moyee_config['primary_color']"/> !important;</t>
+                            <t t-if="moyee_config.get('secondary_color')">--moyee-pink-lt: <t t-esc="moyee_config['secondary_color']"/> !important;</t>
+                        }
+                        <t t-if="moyee_config.get('font_family') and moyee_config['font_family'] != 'system-ui'">
+                            .moyee-account-page, .moyee-page-title, .moyee-section-title, .moyee-btn, .moyee-abo-prod-name, .moyee-nav-card-title, .moyee-upsell-title, .moyee-profile-name, .moyee-taf-title, .moyee-inspire-title {
+                                font-family: "<t t-esc="moyee_config['font_family']"/>", sans-serif !important;
+                            }
+                        </t>
+                    </style>
+                </t>
+
+                <!-- ══ Flash messages ══ -->
+                <t t-if="moyee_home_message">
+                    <div class="moyee-alert moyee-alert-success" style="max-width:1100px;margin:16px auto 0;padding:12px 24px;">
+                        <span>✓</span> <t t-esc="moyee_home_message"/>
+                    </div>
+                </t>
+                <t t-if="moyee_home_error">
+                    <div class="moyee-alert moyee-alert-error" style="max-width:1100px;margin:16px auto 0;padding:12px 24px;">
+                        <span>✕</span> <t t-esc="moyee_home_error"/>
+                    </div>
+                </t>
+
+                <div class="moyee-page-wrap">
+
+                    <!-- ══════════════════════════ MAIN ══════════════════════════ -->
+                    <main>
+
+                        <!-- ── Page title ── -->
+                        <h1 class="moyee-page-title">
+                            Hi <t t-esc="partner.name.split(' ')[0] if partner and partner.name else 'there'"/>,<br/>
+                            Welcome back!
+                        </h1>
+                        <p class="moyee-page-subtitle">
+                            Below you'll find your subscription, orders, invoices and account settings.
+                        </p>
+
+                        <!-- ══════════ SUBSCRIPTION SECTION ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_subscription"/>
+
+                        <!-- ══════════ OVERVIEW NAV CARDS ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_overview"/>
+
+                        <!-- ══════════ ORDERS ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_orders"/>
+
+                        <!-- ══════════ INVOICES ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_invoices"/>
+
+                        <!-- ══════════ PERSONAL DETAILS ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_details"/>
+
+                        <!-- ══════════ FAQ ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_faq"/>
+
+                        <!-- ══════════ BREW LIKE A PRO ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_brew_guides"/>
+
+                        <!-- ══════════ EXTRA (INSPIRE / TAF) ══════════ -->
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_extra"/>
+
+                    </main>
+
+                    <!-- ══════════════════════════ SIDEBAR ══════════════════════════ -->
+                    <aside>
+                        <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_sidebar"/>
+                    </aside>
+
+                </div>
+
+                <!-- ══════════════════════════ MODALS ══════════════════════════ -->
+                <t t-call="moyee_subscription_portal_manager.portal_my_home_moyee_modals"/>
+
+                <!-- Dummy elements to satisfy site-wide custom scripts and prevent addEventListener crashes -->
+                <div style="display: none !important;">
+                    <div class="timeline"></div>
+                    <div class="arrow right"></div>
+                    <div class="arrow left"></div>
+                </div>
+
+            </div><!-- /moyee-account-page -->
+
+        </t>
+    </template>
+
+</odoo>

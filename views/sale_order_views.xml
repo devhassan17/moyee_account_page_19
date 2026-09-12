@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sale_order_form_moyee_subscription_manager" model="ir.ui.view">
+        <field name="name">sale.order.form.moyee.subscription.manager</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Helper fields (used by button visibility / tab visibility) -->
+            <xpath expr="//sheet" position="inside">
+                <field name="is_subscription_order" invisible="1"/>
+                <!-- This one is optional but harmless; helps JS if you ever read it -->
+                <field name="state" invisible="1"/>
+            </xpath>
+
+            <!-- (Best-effort) server-side filter: hide removed/zero lines by default -->
+            <xpath expr="//field[@name='order_line']" position="attributes">
+                <attribute name="domain">
+                    ['|',
+                        ('display_type', '!=', False),
+                        '&amp;',
+                            ('x_moyee_is_removed', '=', False),
+                            ('product_uom_qty', '&gt;', 0)
+                    ]
+                </attribute>
+            </xpath>
+
+            <!-- Ensure fields are loaded in the embedded list/tree for JS + invisible conditions -->
+            <xpath expr="//field[@name='order_line']/*[self::tree or self::list]" position="inside">
+                <field name="display_type" invisible="1"/>
+                <field name="x_moyee_is_removed"/>
+                <!-- IMPORTANT: make sure qty is always present in the record data for JS hiding -->
+                <field name="product_uom_qty" invisible="1"/>
+            </xpath>
+
+            <!-- Remove button visible to ALL INTERNAL USERS -->
+            <xpath expr="//field[@name='order_line']/*[self::tree or self::list]//field[@name='name']" position="after">
+                <button
+                    name="action_moyee_soft_remove"
+                    type="object"
+                    string="Remove"
+                    icon="fa-trash"
+                    class="btn-link"
+                    groups="base.group_user"
+                    invisible="display_type != False or x_moyee_is_removed == True or parent.is_subscription_order == False"
+                />
+            </xpath>
+
+            <!-- Moyee tab -->
+            <xpath expr="//notebook" position="inside">
+                <page
+                    string="Moyee Subscription Manager"
+                    name="moyee_subscription_manager"
+                    groups="base.group_user"
+                    invisible="is_subscription_order == False"
+                >
+                    <group>
+                        <p>
+                            Removed subscription lines are hidden from Order Lines and excluded from future recurring invoices.
+                        </p>
+                    </group>
+
+                    <!-- IMPORTANT: No custom tree here (avoids Odoo 18 validation bug) -->
+                    <group string="Removed Lines">
+                        <field name="moyee_removed_line_ids" nolabel="1" readonly="1"/>
+                    </group>
+
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>
