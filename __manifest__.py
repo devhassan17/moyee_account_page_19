@@ -1,7 +1,7 @@
 # File: moyee_account_page_19/__manifest__.py
 {
     "name": "Moyee Account Page 19",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "category": "Sales",
     "summary": "Soft-remove subscription sale order lines and allow secure portal self-service actions for Odoo 19.",
     "description": """\

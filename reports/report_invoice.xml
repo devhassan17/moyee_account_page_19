@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    
-
     <template id="report_invoice_document_moyee_filter_lines"
               inherit_id="account.report_invoice_document">
 
-        <xpath expr="//table[@name='invoice_line_table']//t[@t-foreach='lines']"
+        <xpath expr="//tbody[hasclass('invoice_tbody')]//t[@t-foreach]"
                position="attributes">
 
-            <attribute name="t-foreach">lines.filtered(lambda l: l.display_type or not l.sale_line_ids.filtered(lambda sol: sol.x_moyee_is_removed))</attribute>
+            <attribute name="t-foreach">(lines if 'lines' in locals() else (lines_to_report if 'lines_to_report' in locals() else o.invoice_line_ids)).filtered(lambda l: l.display_type or not l.sale_line_ids.filtered(lambda sol: sol.x_moyee_is_removed))</attribute>
 
         </xpath>
 
