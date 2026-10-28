@@ -1,9 +1,9 @@
 # File: moyee_account_page_19/__manifest__.py
 {
     "name": "Moyee Account Page 19",
-    "version": "19.0.1.0.3",
+    "version": "19.0.1.0.5",
     "category": "Sales",
-    "summary": "Soft-remove subscription sale order lines and allow secure portal self-service actions for Odoo 19.",
+    "summary": "Soft-remove subscription sale order lines and allow secure portal self-service actions for Odoo 19 with multi-company & multi-website filtering.",
     "description": """\
 Portal + backend build for Odoo 19:
 - Soft remove subscription products (qty=0 + metadata)
@@ -11,7 +11,8 @@ Portal + backend build for Odoo 19:
 - Exclude removed lines from invoice creation
 - Filter invoice PDF lines for safety
 - Portal self-service: change address, push next date, add/remove products, pause/resume
-- Dynamic multi-company and user filtering settings
+- Dynamic multi-company & multi-website filtering settings (predefined for UK Direct to Consumer)
+- Customer-specific portal access control
 """,
     "author": "Managemyweb.co",
     "maintainer": "ali@moyeecoffee.com",

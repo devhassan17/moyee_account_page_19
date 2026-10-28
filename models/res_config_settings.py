@@ -280,8 +280,10 @@ class ResConfigSettings(models.TransientModel):
     def set_values(self):
         super(ResConfigSettings, self).set_values()
         ICP = self.env["ir.config_parameter"].sudo()
-        ICP.set_param("moyee_account_page_19.enable_company_filter", str(self.moyee_enable_company_filter))
-        ICP.set_param("moyee_subscription_portal_manager.enable_company_filter", str(self.moyee_enable_company_filter))
+        enable_filter = bool(self.moyee_allowed_company_ids or self.moyee_allowed_website_ids)
+        self.moyee_enable_company_filter = enable_filter
+        ICP.set_param("moyee_account_page_19.enable_company_filter", str(enable_filter))
+        ICP.set_param("moyee_subscription_portal_manager.enable_company_filter", str(enable_filter))
         
         allowed_ids_str = ",".join(str(cid) for cid in self.moyee_allowed_company_ids.ids)
         ICP.set_param("moyee_account_page_19.allowed_company_ids", allowed_ids_str)

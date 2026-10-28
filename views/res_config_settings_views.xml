@@ -112,28 +112,19 @@
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6 o_setting_box">
-                                <div class="o_setting_left_pane">
-                                    <field name="moyee_enable_company_filter"/>
-                                </div>
-                                <div class="o_setting_right_pane">
-                                    <label for="moyee_enable_company_filter"/>
-                                    <div class="text-muted">If checked, only the selected companies will display the custom Moyee Account Page portal.</div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-lg-6 o_setting_box" invisible="not moyee_enable_company_filter">
                                 <div class="o_setting_left_pane"/>
                                 <div class="o_setting_right_pane">
-                                    <label for="moyee_allowed_company_ids"/>
-                                    <div class="text-muted">Select companies where the redesign portal should be enabled.</div>
-                                    <field name="moyee_allowed_company_ids" widget="many2many_tags" placeholder="Select allowed companies..."/>
+                                    <label for="moyee_allowed_company_ids" string="Allowed Companies (Select Multiple)"/>
+                                    <div class="text-muted">Select all companies that should display the custom Moyee Account Page portal (/my/home). You can select multiple companies.</div>
+                                    <field name="moyee_allowed_company_ids" widget="many2many_tags" placeholder="Select multiple companies (e.g. Moyee Coffee United Kingdom)..."/>
                                 </div>
                             </div>
-                            <div class="col-12 col-lg-6 o_setting_box" invisible="not moyee_enable_company_filter">
+                            <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane"/>
                                 <div class="o_setting_right_pane">
-                                    <label for="moyee_allowed_website_ids"/>
-                                    <div class="text-muted">Optional: Select specific websites (e.g. UK Direct to Consumer). Leave empty to allow all websites in allowed companies.</div>
-                                    <field name="moyee_allowed_website_ids" widget="many2many_tags" placeholder="Select allowed websites..."/>
+                                    <label for="moyee_allowed_website_ids" string="Allowed Websites (Select Multiple)"/>
+                                    <div class="text-muted">Optional: Select specific websites (e.g. UK Direct to Consumer). Leave empty to allow all websites in the selected companies.</div>
+                                    <field name="moyee_allowed_website_ids" widget="many2many_tags" placeholder="Select multiple websites (e.g. UK Direct to Consumer)..."/>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-6 o_setting_box">
