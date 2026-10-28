@@ -1,6 +1,6 @@
 # Moyee Account Page 19 (`moyee_account_page_19`): Complete Technical Documentation
 
-This document serves as the comprehensive technical specification and architectural manual for the **Moyee Account Page 19** module (version `19.0.1.0.0`). Developed for Odoo 19, this module introduces an advanced "soft-remove" paradigm for subscription lines, filters backend and invoice layouts dynamically, exposes a high-end customer self-service portal interface for secure subscription administration, and provides dynamic company and customer configuration controls.
+This document serves as the comprehensive technical specification and architectural manual for the **Moyee Account Page 19** module (version `19.0.1.0.2`). Developed for Odoo 19, this module introduces an advanced "soft-remove" paradigm for subscription lines, filters backend and invoice layouts dynamically, exposes a high-end customer self-service portal interface for secure subscription administration, and provides dynamic company and customer configuration controls.
 
 ---
 
@@ -35,7 +35,7 @@ graph TD
 3. **Write-Through Security Guard**:
    All portal controllers bypass typical standard access rights using `.sudo()` ONLY after running rigorous validation checks. These checks ensure the logged-in user belongs to the exact commercial partner linked to the subscription, or holds a validated cryptographic `access_token` from a shared link.
 4. **Dynamic Company & Partner Configuration**:
-   Administrators can enable or disable the custom portal page per company (`moyee_enable_company_portal`), restrict activation to specific allowed companies (`moyee_enable_company_filter` / `moyee_allowed_company_ids`), or filter portal access by customer (`moyee_enable_user_filter` / `moyee_redesign_partner_ids`). Hardcoded company name restrictions have been completely eliminated.
+   Administrators can enable or disable the custom portal page per company (`moyee_enable_company_portal`), restrict activation to specific allowed companies globally (`moyee_enable_company_filter` / `moyee_allowed_company_ids`), or filter portal access by customer (`moyee_enable_user_filter` / `moyee_redesign_partner_ids`). When the company filter is enabled, only companies explicitly whitelisted in `moyee_allowed_company_ids` render the custom portal (/my/home); all other companies automatically fall back to Odoo's native portal. Hardcoded company name restrictions have been completely eliminated.
 
 ---
 

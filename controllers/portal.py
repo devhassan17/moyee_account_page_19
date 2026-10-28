@@ -80,7 +80,7 @@ class MoyeePortalHome(CustomerPortal):
         max_price = 0.0
 
         current_website = getattr(request, "website", False)
-        current_company_id = current_website and current_website.company_id.id or request.env.company.id
+        current_company_id = (current_website and current_website.company_id and current_website.company_id.id) or (request.env.company and request.env.company.id) or (getattr(request.env.user, "company_id", False) and request.env.user.company_id.id)
 
         # Find the user's active subscription order
         sub_domain = [
@@ -363,10 +363,52 @@ class MoyeePortalHome(CustomerPortal):
         return values
 
     def _is_moyee_redesign_active_for_user(self):
-        company = getattr(request, "website", False) and request.website.company_id or request.env.company
+        current_website = getattr(request, "website", False)
+        company = (current_website and current_website.company_id) or request.env.company
+        if not company and hasattr(request.env.user, "company_id"):
+            company = request.env.user.company_id
+        if not company:
+            return False
+
         company_sudo = company.sudo()
-        
-        # Check company portal toggle for active company
+        ICP = request.env["ir.config_parameter"].sudo()
+
+        def _get_param_val(key):
+            val = ICP.get_param(f"moyee_account_page_19.{key}")
+            if val is None:
+                val = ICP.get_param(f"moyee_subscription_portal_manager.{key}")
+            return val
+
+        # 1. Global Allowed Companies Filter (Whitelist)
+        company_filter_param = _get_param_val("enable_company_filter")
+        if company_filter_param is not None:
+            enable_company_filter = str(company_filter_param).lower() in ("true", "1", "yes")
+        else:
+            ResCompany = request.env["res.company"].sudo()
+            enable_company_filter = bool(
+                "moyee_enable_company_filter" in ResCompany._fields
+                and ResCompany.search([("moyee_enable_company_filter", "=", True)], limit=1)
+            )
+
+        if enable_company_filter:
+            allowed_ids_param = _get_param_val("allowed_company_ids")
+            if allowed_ids_param is not None:
+                allowed_company_ids = set(
+                    int(i.strip()) for i in str(allowed_ids_param).split(",") if i.strip().isdigit()
+                )
+            else:
+                ResCompany = request.env["res.company"].sudo()
+                allowed_company_ids = set(
+                    ResCompany.search([("moyee_enable_company_filter", "=", True)])
+                    .mapped("moyee_allowed_company_ids")
+                    .ids
+                )
+
+            # If company filter is enabled, only selected allowed companies can display the redesign
+            if allowed_company_ids and company.id not in allowed_company_ids:
+                return False
+
+        # 2. Check per-company portal toggle for active company
         if "moyee_enable_company_portal" in company_sudo._fields:
             try:
                 if not company_sudo.moyee_enable_company_portal:
@@ -374,16 +416,7 @@ class MoyeePortalHome(CustomerPortal):
             except Exception:
                 pass
 
-        # Check allowed company filter if enabled
-        if "moyee_enable_company_filter" in company_sudo._fields and company_sudo.moyee_enable_company_filter:
-            try:
-                allowed_companies = company_sudo.moyee_allowed_company_ids
-                if allowed_companies and company.id not in allowed_companies.ids:
-                    return False
-            except Exception as e:
-                _logger.error("Moyee company filter error: %s", e)
-                return False
-
+        # 3. Check customer/partner filter if enabled
         enable_user_filter = False
         if "moyee_enable_user_filter" in company_sudo._fields:
             try:

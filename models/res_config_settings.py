@@ -1,5 +1,5 @@
 # File: moyee_account_page_19/models/res_config_settings.py
-from odoo import fields, models
+from odoo import api, fields, models
 
 
 class ResCompany(models.Model):
@@ -47,15 +47,19 @@ class ResConfigSettings(models.TransientModel):
         string="Enable Moyee Account Page Portal for Active Company",
     )
     moyee_enable_company_filter = fields.Boolean(
-        related="company_id.moyee_enable_company_filter",
-        readonly=False,
         string="Filter Redesign Portal by Specific Companies",
+        help="If checked, only the selected companies will display the custom Moyee Account Page portal.",
     )
     moyee_allowed_company_ids = fields.Many2many(
-        related="company_id.moyee_allowed_company_ids",
-        readonly=False,
+        comodel_name="res.company",
         string="Allowed Companies for Portal Redesign",
+        help="Select companies where the redesign portal should be enabled.",
     )
+
+    @api.onchange("moyee_enable_company_filter")
+    def _onchange_moyee_enable_company_filter(self):
+        if self.moyee_enable_company_filter and not self.moyee_allowed_company_ids and self.company_id:
+            self.moyee_allowed_company_ids = [(6, 0, [self.company_id.id])]
     moyee_enable_user_filter = fields.Boolean(
         related="company_id.moyee_enable_user_filter",
         readonly=False,
@@ -204,7 +208,26 @@ class ResConfigSettings(models.TransientModel):
                 val = ICP.get_param(f"moyee_subscription_portal_manager.{key}", default)
             return str(val).lower() in ("true", "1", "yes")
 
+        # Global company filter & allowed companies
+        val_filter = ICP.get_param("moyee_account_page_19.enable_company_filter")
+        if val_filter is None:
+            val_filter = ICP.get_param("moyee_subscription_portal_manager.enable_company_filter")
+        if val_filter is not None:
+            enable_comp_filter = str(val_filter).lower() in ("true", "1", "yes")
+        else:
+            enable_comp_filter = bool(self.company_id.moyee_enable_company_filter) if self.company_id else False
+
+        val_allowed = ICP.get_param("moyee_account_page_19.allowed_company_ids")
+        if val_allowed is None:
+            val_allowed = ICP.get_param("moyee_subscription_portal_manager.allowed_company_ids")
+        if val_allowed is not None:
+            allowed_ids = [int(i.strip()) for i in str(val_allowed).split(",") if i.strip().isdigit()]
+        else:
+            allowed_ids = self.company_id.moyee_allowed_company_ids.ids if self.company_id else []
+
         res.update(
+            moyee_enable_company_filter=enable_comp_filter,
+            moyee_allowed_company_ids=[(6, 0, allowed_ids)],
             moyee_show_subscription=_param("show_subscription"),
             moyee_show_overview=_param("show_overview"),
             moyee_show_orders=_param("show_orders"),
@@ -222,6 +245,19 @@ class ResConfigSettings(models.TransientModel):
     def set_values(self):
         super(ResConfigSettings, self).set_values()
         ICP = self.env["ir.config_parameter"].sudo()
+        ICP.set_param("moyee_account_page_19.enable_company_filter", str(self.moyee_enable_company_filter))
+        ICP.set_param("moyee_subscription_portal_manager.enable_company_filter", str(self.moyee_enable_company_filter))
+        
+        allowed_ids_str = ",".join(str(cid) for cid in self.moyee_allowed_company_ids.ids)
+        ICP.set_param("moyee_account_page_19.allowed_company_ids", allowed_ids_str)
+        ICP.set_param("moyee_subscription_portal_manager.allowed_company_ids", allowed_ids_str)
+
+        if self.company_id and "moyee_enable_company_filter" in self.company_id._fields:
+            self.company_id.sudo().write({
+                "moyee_enable_company_filter": self.moyee_enable_company_filter,
+                "moyee_allowed_company_ids": [(6, 0, self.moyee_allowed_company_ids.ids)],
+            })
+
         params = {
             "show_subscription": str(self.moyee_show_subscription),
             "show_overview": str(self.moyee_show_overview),
