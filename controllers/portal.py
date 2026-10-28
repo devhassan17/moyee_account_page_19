@@ -379,33 +379,40 @@ class MoyeePortalHome(CustomerPortal):
                 val = ICP.get_param(f"moyee_subscription_portal_manager.{key}")
             return val
 
-        # 1. Global Allowed Companies Filter (Whitelist)
+        # 1. Global Allowed Companies & Websites Filter
+        # Predefined defaults: Company ID 7 ('Moyee Coffee United Kingdom'), Website ID 3 ('UK Direct to Consumer')
+        PREDEFINED_ALLOWED_COMPANY_IDS = {7}
+        PREDEFINED_ALLOWED_WEBSITE_IDS = {3}
+
         company_filter_param = _get_param_val("enable_company_filter")
         if company_filter_param is not None:
             enable_company_filter = str(company_filter_param).lower() in ("true", "1", "yes")
         else:
-            ResCompany = request.env["res.company"].sudo()
-            enable_company_filter = bool(
-                "moyee_enable_company_filter" in ResCompany._fields
-                and ResCompany.search([("moyee_enable_company_filter", "=", True)], limit=1)
-            )
+            enable_company_filter = True  # Predefined active by default to protect other companies
 
         if enable_company_filter:
             allowed_ids_param = _get_param_val("allowed_company_ids")
-            if allowed_ids_param is not None:
+            if allowed_ids_param is not None and str(allowed_ids_param).strip():
                 allowed_company_ids = set(
                     int(i.strip()) for i in str(allowed_ids_param).split(",") if i.strip().isdigit()
                 )
             else:
-                ResCompany = request.env["res.company"].sudo()
-                allowed_company_ids = set(
-                    ResCompany.search([("moyee_enable_company_filter", "=", True)])
-                    .mapped("moyee_allowed_company_ids")
-                    .ids
-                )
+                allowed_company_ids = PREDEFINED_ALLOWED_COMPANY_IDS
 
-            # If company filter is enabled, only selected allowed companies can display the redesign
+            # Block request if company is not allowed
             if allowed_company_ids and company.id not in allowed_company_ids:
+                return False
+
+            # Check website whitelist
+            allowed_web_param = _get_param_val("allowed_website_ids")
+            if allowed_web_param is not None and str(allowed_web_param).strip():
+                allowed_website_ids = set(
+                    int(i.strip()) for i in str(allowed_web_param).split(",") if i.strip().isdigit()
+                )
+            else:
+                allowed_website_ids = PREDEFINED_ALLOWED_WEBSITE_IDS
+
+            if current_website and allowed_website_ids and current_website.id not in allowed_website_ids:
                 return False
 
         # 2. Check per-company portal toggle for active company

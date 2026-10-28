@@ -53,13 +53,27 @@ class ResConfigSettings(models.TransientModel):
     moyee_allowed_company_ids = fields.Many2many(
         comodel_name="res.company",
         string="Allowed Companies for Portal Redesign",
-        help="Select companies where the redesign portal should be enabled.",
+        help="Select companies where the redesign portal should be enabled (Default: Company ID 7 'Moyee Coffee United Kingdom').",
+    )
+    moyee_allowed_website_ids = fields.Many2many(
+        comodel_name="website",
+        string="Allowed Websites for Portal Redesign",
+        help="Optional: Select specific websites where the redesign should be enabled (Default: Website ID 3 'UK Direct to Consumer'). Leave empty to allow all websites in allowed companies.",
     )
 
     @api.onchange("moyee_enable_company_filter")
     def _onchange_moyee_enable_company_filter(self):
-        if self.moyee_enable_company_filter and not self.moyee_allowed_company_ids and self.company_id:
-            self.moyee_allowed_company_ids = [(6, 0, [self.company_id.id])]
+        if self.moyee_enable_company_filter:
+            if not self.moyee_allowed_company_ids:
+                comp_7 = self.env["res.company"].sudo().browse(7)
+                if comp_7.exists():
+                    self.moyee_allowed_company_ids = [(6, 0, [7])]
+                elif self.company_id:
+                    self.moyee_allowed_company_ids = [(6, 0, [self.company_id.id])]
+            if not self.moyee_allowed_website_ids:
+                web_3 = self.env["website"].sudo().browse(3)
+                if web_3.exists():
+                    self.moyee_allowed_website_ids = [(6, 0, [3])]
     moyee_enable_user_filter = fields.Boolean(
         related="company_id.moyee_enable_user_filter",
         readonly=False,
@@ -215,19 +229,40 @@ class ResConfigSettings(models.TransientModel):
         if val_filter is not None:
             enable_comp_filter = str(val_filter).lower() in ("true", "1", "yes")
         else:
-            enable_comp_filter = bool(self.company_id.moyee_enable_company_filter) if self.company_id else False
+            enable_comp_filter = True  # Predefined: enabled by default for target company
 
         val_allowed = ICP.get_param("moyee_account_page_19.allowed_company_ids")
         if val_allowed is None:
             val_allowed = ICP.get_param("moyee_subscription_portal_manager.allowed_company_ids")
-        if val_allowed is not None:
+        if val_allowed is not None and str(val_allowed).strip():
             allowed_ids = [int(i.strip()) for i in str(val_allowed).split(",") if i.strip().isdigit()]
         else:
-            allowed_ids = self.company_id.moyee_allowed_company_ids.ids if self.company_id else []
+            # Predefined default: Company ID 7 ('Moyee Coffee United Kingdom')
+            comp_7 = self.env["res.company"].sudo().browse(7)
+            if comp_7.exists():
+                allowed_ids = [7]
+            elif self.company_id:
+                allowed_ids = [self.company_id.id]
+            else:
+                allowed_ids = []
+
+        val_allowed_web = ICP.get_param("moyee_account_page_19.allowed_website_ids")
+        if val_allowed_web is None:
+            val_allowed_web = ICP.get_param("moyee_subscription_portal_manager.allowed_website_ids")
+        if val_allowed_web is not None and str(val_allowed_web).strip():
+            allowed_web_ids = [int(i.strip()) for i in str(val_allowed_web).split(",") if i.strip().isdigit()]
+        else:
+            # Predefined default: Website ID 3 ('UK Direct to Consumer')
+            web_3 = self.env["website"].sudo().browse(3)
+            if web_3.exists():
+                allowed_web_ids = [3]
+            else:
+                allowed_web_ids = []
 
         res.update(
             moyee_enable_company_filter=enable_comp_filter,
             moyee_allowed_company_ids=[(6, 0, allowed_ids)],
+            moyee_allowed_website_ids=[(6, 0, allowed_web_ids)],
             moyee_show_subscription=_param("show_subscription"),
             moyee_show_overview=_param("show_overview"),
             moyee_show_orders=_param("show_orders"),
@@ -251,6 +286,10 @@ class ResConfigSettings(models.TransientModel):
         allowed_ids_str = ",".join(str(cid) for cid in self.moyee_allowed_company_ids.ids)
         ICP.set_param("moyee_account_page_19.allowed_company_ids", allowed_ids_str)
         ICP.set_param("moyee_subscription_portal_manager.allowed_company_ids", allowed_ids_str)
+
+        allowed_web_ids_str = ",".join(str(wid) for wid in self.moyee_allowed_website_ids.ids)
+        ICP.set_param("moyee_account_page_19.allowed_website_ids", allowed_web_ids_str)
+        ICP.set_param("moyee_subscription_portal_manager.allowed_website_ids", allowed_web_ids_str)
 
         if self.company_id and "moyee_enable_company_filter" in self.company_id._fields:
             self.company_id.sudo().write({

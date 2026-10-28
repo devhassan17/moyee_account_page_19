@@ -128,6 +128,14 @@
                                     <field name="moyee_allowed_company_ids" widget="many2many_tags" placeholder="Select allowed companies..."/>
                                 </div>
                             </div>
+                            <div class="col-12 col-lg-6 o_setting_box" invisible="not moyee_enable_company_filter">
+                                <div class="o_setting_left_pane"/>
+                                <div class="o_setting_right_pane">
+                                    <label for="moyee_allowed_website_ids"/>
+                                    <div class="text-muted">Optional: Select specific websites (e.g. UK Direct to Consumer). Leave empty to allow all websites in allowed companies.</div>
+                                    <field name="moyee_allowed_website_ids" widget="many2many_tags" placeholder="Select allowed websites..."/>
+                                </div>
+                            </div>
                             <div class="col-12 col-lg-6 o_setting_box">
                                 <div class="o_setting_left_pane">
                                     <field name="moyee_enable_user_filter"/>

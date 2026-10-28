@@ -1,6 +1,6 @@
 # Moyee Account Page 19 (`moyee_account_page_19`): Complete Technical Documentation
 
-This document serves as the comprehensive technical specification and architectural manual for the **Moyee Account Page 19** module (version `19.0.1.0.2`). Developed for Odoo 19, this module introduces an advanced "soft-remove" paradigm for subscription lines, filters backend and invoice layouts dynamically, exposes a high-end customer self-service portal interface for secure subscription administration, and provides dynamic company and customer configuration controls.
+This document serves as the comprehensive technical specification and architectural manual for the **Moyee Account Page 19** module (version `19.0.1.0.3`). Developed for Odoo 19, this module introduces an advanced "soft-remove" paradigm for subscription lines, filters backend and invoice layouts dynamically, exposes a high-end customer self-service portal interface for secure subscription administration, and provides dynamic company and customer configuration controls.
 
 ---
 
